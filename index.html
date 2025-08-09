@@ -55,11 +55,24 @@
     .card.tall{ grid-row:span 2 }
     .card img{ width:100%; aspect-ratio:4/3; height:auto; object-fit:cover; display:block }
     .card.heart img{ clip-path:path('M24.5,7.6c5.6-6,15.4-6,21,0l1,1c5.6,6,5.6,15.8,0,21.8l-18,19a4,4,0,0,1-5.8,0l-18-19c-5.6-6-5.6-15.8,0-21.8l1-1c5.6-6,15.4-6,21,0Z') }
-    .cap{ position:absolute; left:50%; bottom:10px; transform:translateX(-50%); width:calc(100% - 18px); padding:4px 6px; text-align:center; font-size:13px; font-weight:700; letter-spacing:.2px;
-      background:linear-gradient(90deg,var(--hot),var(--vio)); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 1px 8px #000 }
 
-    @media (max-width:860px){ .hero{ grid-template-columns:1fr } .portrait{ order:-1 } .card{ grid-column:span 6 } .card img{ aspect-ratio:3/2 } }
-    @media (max-width:520px){ :root{--space:10px} .card{ grid-column:span 12 } .grid{ gap:10px } .btn{ width:100%; justify-content:center } .chip{ display:none } .cap{ font-size:12px; bottom:8px; width:calc(100% - 14px) } }
+    /* caption block biar jelas */
+    .cap{
+      position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
+      width:calc(100% - 18px); padding:6px 8px; text-align:center;
+      font-size:13px; font-weight:700; letter-spacing:.2px;
+      background:rgba(0,0,0,.55); color:#fff; border-radius:8px;
+      text-shadow:none;
+    }
+
+    /* reveal halus */
+    .reveal{ opacity:0; transform:translateY(12px) scale(1.01); will-change:transform,opacity }
+    .reveal.show{ opacity:1; transform:translateY(0) scale(1); transition:transform .6s cubic-bezier(.22,.61,.36,1), opacity .6s }
+    @media (max-width:520px){
+      .reveal{ transform:translateY(8px) scale(1.006) }
+      .reveal.show{ transition:transform .5s ease, opacity .5s }
+      .card img,.portrait img{ animation:none !important }
+    }
 
     /* lightbox */
     .lightbox{ position:fixed; inset:0; background:#0008; display:none; align-items:center; justify-content:center; z-index:80; backdrop-filter:blur(4px) }
@@ -88,12 +101,25 @@
     .burst{ position:absolute; inset:0; pointer-events:none; opacity:0 }
     .burst.show{ opacity:1; animation:pop .8s ease forwards }
     @keyframes pop{ 0%{ transform:scale(.9); opacity:0 } 60%{ transform:scale(1.02); opacity:1 } 100%{ transform:scale(1); opacity:0 } }
+
+    /* LIGHT THEME VARS */
+    [data-theme="light"]{
+      --bg1:#fdfdfd; --bg2:#f2f3f5; --card:#ffffff; --ink:#222; --muted:#555;
+    }
+    [data-theme="light"] body{
+      background:
+        radial-gradient(900px 600px at 80% -10%, #ffffff 0%, transparent 60%),
+        radial-gradient(900px 600px at -10% 10%, #f7f7f7 0%, transparent 60%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+    }
+    [data-theme="light"] .btn-ghost{ background:#fff; border-color:#e6e8ec; color:#222 }
+    [data-theme="light"] header{ background:#ffffffcc; border-bottom-color:#e6e8ec }
   </style>
 </head>
 <body>
   <div class="hearts" id="hearts" aria-hidden="true"></div>
 
-  <!-- playful password gate -->
+  <!-- gate lucu -->
   <div id="gate" role="dialog" aria-modal="true">
     <div class="panel">
       <h1 class="grad">For Elin, Ceweku Tercinta.</h1>
@@ -124,7 +150,9 @@
         <p>ini rumah kecil buat nyimpan momen & kata-kata rindu. semoga setiap scroll bikin kamu ngerasa jadi main character di hatiku.</p>
         <div class="cta">
           <button class="btn btn-primary" id="missBtn">i miss u :(</button>
-          <button class="btn btn-ghost" id="bucinBtn">nyalakan bucin mode ✨</button>
+          <!-- ganti bucin -> theme toggle -->
+          <button class="btn btn-ghost" id="themeBtn">🌙 / ☀️</button>
+          <!-- sesuaikan nama file lagu; kalau di repo lo: assets/lagu-kita.mp3 -->
           <audio id="bgm" src="assets/lagu-kita.mp3" preload="auto"></audio>
         </div>
       </div>
@@ -134,11 +162,11 @@
       </figure>
     </section>
 
-    <!-- QUOTE PAPER -->
+    <!-- QUOTE -->
     <section>
       <div style="background:#12151d; border:1px solid #2a2f3b; border-radius:24px; box-shadow:0 18px 40px #0004; padding:18px; position:relative">
         <div style="font-family:'Great Vibes',cursive; font-size:clamp(22px,5vw,36px); color:#f25c9c">“rindu itu sunyi, tapi kamu bikin sunyi jadi rumah.”</div>
-        <p style="margin:.4rem 0 0; color:var(--muted)">hehehe, coba aku bikinkan website untuk mengutarakan rasa ke kangenkuu, hikss hiksss :( <code>messages</code>.</p>
+        <p style="margin:.4rem 0 0; color:var(--muted)">kalimat manis akan ngetik otomatis di judul. list bisa diedit di variabel <code>messages</code>.</p>
       </div>
     </section>
 
@@ -146,14 +174,14 @@
     <section>
       <h2>galeri rasa (klik untuk memperbesar)</h2>
       <div class="grid" id="gallery">
-        <figure class="card heart reveal"><img loading="lazy" src="assets/elin-2.jpg" alt="elin selfie 1"><figcaption class="cap">rindu yang selalu pulang ke kamu.</figcaption></figure>
-        <figure class="card tall reveal"><img loading="lazy" src="assets/elin-3.jpg" alt="elin selfie 2"><figcaption class="cap">jarak cuma angka, rasa tetap dekat.</figcaption></figure>
-        <figure class="card reveal"><img loading="lazy" src="assets/elin-4.jpg" alt="elin selfie 3"><figcaption class="cap">setiap detik: kangen kamu.</figcaption></figure>
-        <figure class="card heart reveal"><img loading="lazy" src="assets/bareng-1.jpg" alt="luqman & elin 1"><figcaption class="cap">jauh di peta, dekat di dada.</figcaption></figure>
-        <figure class="card reveal"><img loading="lazy" src="assets/elin-5.jpg" alt="elin wink 1"><figcaption class="cap">kangen yang manis, kayak kamu.</figcaption></figure>
-        <figure class="card tall reveal"><img loading="lazy" src="assets/elin-6.jpg" alt="elin wink 2"><figcaption class="cap">setiap pulang, namamu duluan.</figcaption></figure>
-        <figure class="card heart reveal"><img loading="lazy" src="assets/bareng-2.jpg" alt="luqman & elin 2"><figcaption class="cap">kalau kangen punya wajah, itu kamu.</figcaption></figure>
-        <figure class="card reveal"><img loading="lazy" src="assets/bareng-3.jpg" alt="luqman & elin 3"><figcaption class="cap">berapa jauh? segini rinduku.</figcaption></figure>
+        <figure class="card heart reveal"><img loading="lazy" src="assets/elin-2.jpg" alt="elin-2"><figcaption class="cap">rindu yang selalu pulang ke kamu.</figcaption></figure>
+        <figure class="card tall custom-elin3 reveal"><img loading="lazy" src="assets/elin-3.jpg" alt="elin-3"><figcaption class="cap">jarak cuma angka, rasa tetap dekat.</figcaption></figure>
+        <figure class="card reveal"><img loading="lazy" src="assets/elin-4.jpg" alt="elin-4"><figcaption class="cap">setiap detik: kangen kamu.</figcaption></figure>
+        <figure class="card heart reveal"><img loading="lazy" src="assets/bareng-1.jpg" alt="bareng-1"><figcaption class="cap">jauh di peta, dekat di dada.</figcaption></figure>
+        <figure class="card reveal"><img loading="lazy" src="assets/elin-5.jpg" alt="elin-5"><figcaption class="cap">kangen yang manis, kayak kamu.</figcaption></figure>
+        <figure class="card tall reveal"><img loading="lazy" src="assets/elin-6.jpg" alt="elin-6"><figcaption class="cap">setiap pulang, namamu duluan.</figcaption></figure>
+        <figure class="card heart reveal"><img loading="lazy" src="assets/bareng-2.jpg" alt="bareng-2"><figcaption class="cap">kalau kangen punya wajah, itu kamu.</figcaption></figure>
+        <figure class="card reveal"><img loading="lazy" src="assets/bareng-3.jpg" alt="bareng-3"><figcaption class="cap">berapa jauh? segini rinduku.</figcaption></figure>
       </div>
     </section>
   </main>
@@ -164,7 +192,7 @@
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true"><img alt="preview"></div>
 
   <script>
-    // ==== gate open (accept any answer) ====
+    // gate (terima jawaban apa aja)
     (function(){
       const gate=document.getElementById('gate');
       if(sessionStorage.getItem('unlocked')){ gate.style.display='none'; return; }
@@ -173,7 +201,7 @@
       document.getElementById('pwd').addEventListener('keydown', e=>{ if(e.key==='Enter') act(); });
     })();
 
-    // ==== typewriter (tema rindu) ====
+    // typewriter
     const messages=[
       'rindu paling panjang adalah nunggu kabar darimu.',
       'tak ketemu sehari, rasanya seminggu.',
@@ -187,36 +215,46 @@
     const elType=document.getElementById('type');
     let i=0,j=0,del=false; (function loop(){ const m=messages[i%messages.length]; if(!del){ j++; elType.textContent=m.slice(0,j); if(j===m.length){ del=true; return setTimeout(loop,1400);} } else { j--; elType.textContent=m.slice(0,j); if(j===0){ del=false; i++; } } setTimeout(loop, del?28:36); })();
 
-    // ==== hearts (normal) ====
+    // hearts normal
     const hearts=document.getElementById('hearts');
     const isSmall=window.matchMedia('(max-width:520px)').matches;
     const base=isSmall?1100:800;
     function spawnHeart(){ const h=document.createElement('div'); h.className='heart'; h.textContent='❤'; h.style.left=Math.random()*100+'vw'; h.style.animationDuration=6+Math.random()*6+'s'; h.style.fontSize=10+Math.random()*18+'px'; h.style.opacity=.3+Math.random()*.5; hearts.appendChild(h); setTimeout(()=>h.remove(),13000); }
-    let heartTimer=setInterval(spawnHeart, base);
+    setInterval(spawnHeart, base);
 
-    // ==== lightbox ====
+    // lightbox
     const lb=document.getElementById('lightbox'); const lbImg=lb.querySelector('img');
     document.getElementById('gallery').addEventListener('click',e=>{ const fig=e.target.closest('figure'); if(!fig) return; const img=fig.querySelector('img'); lbImg.src=img.src; lb.classList.add('open'); document.body.style.overflow='hidden'; });
     lb.addEventListener('click',()=>{ lb.classList.remove('open'); document.body.style.overflow=''; });
 
-    // ==== bucin mode ====
-    const bucinBtn=document.getElementById('bucinBtn'); let bucinOn=false, extra;
-    bucinBtn.addEventListener('click',()=>{ bucinOn=!bucinOn; bucinBtn.textContent=bucinOn?'matikan bucin mode ✨':'nyalakan bucin mode ✨'; document.body.style.filter=bucinOn?'saturate(1.2)':'none'; document.body.style.transition='.3s filter'; if(bucinOn){ extra=setInterval(spawnHeart, isSmall?500:350);} else { clearInterval(extra);} });
-
-    // ==== miss button controls music & text ====
+    // music control
     const missBtn=document.getElementById('missBtn'); const audio=document.getElementById('bgm'); let playing=false;
-    missBtn.addEventListener('click', async ()=>{ try{ if(!playing){ await audio.play(); missBtn.textContent='hehe... kangenn:(' } else { audio.pause(); missBtn.textContent='i miss u :(' } playing=!playing; }catch(e){ console.debug('play blocked', e);} });
+    missBtn.addEventListener('click', async ()=>{ try{ if(!playing){ await audio.play(); missBtn.textContent='hehe... kangenn:(' } else { audio.pause(); missBtn.textContent='i miss u :(' } playing=!playing; }catch(e){ alert('musik belum bisa diputar. cek nama/path file.'); console.debug(e);} });
 
-    // ==== year ====
+    // theme toggle
+    const themeBtn=document.getElementById('themeBtn');
+    themeBtn.addEventListener('click',()=>{
+      const cur=document.documentElement.getAttribute('data-theme');
+      const next=cur==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',next);
+      localStorage.setItem('theme',next);
+    });
+    const savedTheme=localStorage.getItem('theme'); if(savedTheme){ document.documentElement.setAttribute('data-theme',savedTheme); }
+
+    // reveal on scroll
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){ entry.target.classList.add('show'); io.unobserve(entry.target); }
+      });
+    },{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+    // tahun
     document.getElementById('year').textContent=new Date().getFullYear();
-  </script>
 
-  <!--
-    ===== PETUNJUK GAMBAR =====
-    taruh file ke folder /assets dengan nama:
-    - elin-1.jpg, elin-2.jpg, elin-3.jpg, elin-4.jpg, elin-5.jpg, elin-6.jpg
-    - bareng-1.jpg, bareng-2.jpg, bareng-3.jpg
-    kalau nama berbeda, cukup ubah atribut src di <img> terkait.
-  -->
+    // fokus crop untuk elin-3 (biar wajah pas)
+    const elin3 = document.querySelector('.custom-elin3 img');
+    if(elin3) elin3.style.objectPosition = 'top center';
+  </script>
 </body>
 </html>
